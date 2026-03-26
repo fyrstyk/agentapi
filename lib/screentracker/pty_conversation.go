@@ -386,7 +386,6 @@ func (c *PTYConversation) sendMessage(ctx context.Context, messageParts ...Messa
 	c.lock.Lock()
 	screenBeforeMessage := c.cfg.AgentIO.ReadScreen()
 	now := c.cfg.Clock.Now()
-	c.updateLastAgentMessageLocked(screenBeforeMessage, now)
 	c.writingMessage = true
 	c.lock.Unlock()
 

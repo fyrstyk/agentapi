@@ -6,36 +6,37 @@ import (
 	"github.com/coder/agentapi/lib/msgfmt"
 )
 
-// screenDiff compares two screen states and attempts to find latest message of the given agent type.
+// screenDiff compares two screen states and returns new content added since oldScreen.
+// Uses positional line comparison to avoid false positives from set-based matching,
+// which caused old content to be included when new lines happened to match old lines
+// at different positions (issue #205).
 func screenDiff(oldScreen, newScreen string, agentType msgfmt.AgentType) string {
 	oldLines := strings.Split(oldScreen, "\n")
 	newLines := strings.Split(newScreen, "\n")
-	oldLinesMap := make(map[string]bool)
 
-	// -1 indicates no header
-	dynamicHeaderEnd := -1
-
-	// Skip header lines for Opencode agent type to avoid false positives
+	// Skip header lines for Opencode agent type to avoid false positives.
 	// The header contains dynamic content (token count, context percentage, cost)
-	// that changes between screens, causing line comparison mismatches:
-	//
-	// ┃  # Getting Started with Claude CLI                                   ┃
-	// ┃  /share to create a shareable link                 12.6K/6% ($0.05)  ┃
+	// that changes between screens, causing line comparison mismatches.
+	headerOffset := 0
 	if len(newLines) >= 2 && agentType == msgfmt.AgentTypeOpencode {
-		dynamicHeaderEnd = 2
+		headerOffset = 2
 	}
 
-	for _, line := range oldLines {
-		oldLinesMap[line] = true
-	}
-	firstNonMatchingLine := len(newLines)
-	for i, line := range newLines[dynamicHeaderEnd+1:] {
-		if !oldLinesMap[line] {
-			firstNonMatchingLine = i
+	// Find the first line index (positional) where old and new screens diverge.
+	// New content starts at this point.
+	firstDivergence := len(newLines)
+	for i := headerOffset; i < len(newLines); i++ {
+		if i >= len(oldLines) || oldLines[i] != newLines[i] {
+			firstDivergence = i
 			break
 		}
 	}
-	newSectionLines := newLines[firstNonMatchingLine:]
+
+	newSectionLines := newLines[firstDivergence:]
+
+	if len(newSectionLines) == 0 {
+		return ""
+	}
 
 	// remove leading and trailing lines which are empty or have only whitespace
 	startLine := 0
