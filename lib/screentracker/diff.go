@@ -48,6 +48,25 @@ func screenDiff(oldScreen, newScreen string, agentType msgfmt.AgentType) string 
 		return ""
 	}
 
+	// For Claude: truncate at the input box boundary.
+	// Claude Code's TUI renders a full-width ─ divider above the ❯ prompt,
+	// followed by old buffer content below the visible area. Everything from
+	// that divider onwards is UI chrome or stale buffer artifacts, not content.
+	// The divider is a line consisting entirely of ─ (U+2500) characters.
+	if agentType == msgfmt.AgentTypeClaude {
+		for i, line := range newSectionLines {
+			trimmed := strings.TrimSpace(line)
+			if len(trimmed) >= 40 && strings.Count(trimmed, "─") == len(trimmed) {
+				newSectionLines = newSectionLines[:i]
+				break
+			}
+		}
+	}
+
+	if len(newSectionLines) == 0 {
+		return ""
+	}
+
 	// remove leading and trailing lines which are empty or have only whitespace
 	startLine := 0
 	endLine := len(newSectionLines) - 1
