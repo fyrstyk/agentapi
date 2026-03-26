@@ -14,12 +14,22 @@ func screenDiff(oldScreen, newScreen string, agentType msgfmt.AgentType) string 
 	oldLines := strings.Split(oldScreen, "\n")
 	newLines := strings.Split(newScreen, "\n")
 
-	// Skip header lines for Opencode agent type to avoid false positives.
-	// The header contains dynamic content (token count, context percentage, cost)
-	// that changes between screens, causing line comparison mismatches.
+	// Skip dynamic header lines to avoid false positives from content that
+	// changes on every render (spinners, cursors, token counts, etc.).
 	headerOffset := 0
-	if len(newLines) >= 2 && agentType == msgfmt.AgentTypeOpencode {
-		headerOffset = 2
+	switch agentType {
+	case msgfmt.AgentTypeClaude:
+		// Claude Code TUI has a dynamic spinner/cursor on line 0:
+		//   e.g. "    █                           e"
+		// Skipping it prevents firstDivergence=0 on every render.
+		headerOffset = 1
+	case msgfmt.AgentTypeOpencode:
+		// Opencode header contains dynamic token count and cost (2 lines):
+		//   ┃  # Getting Started with Claude CLI                                   ┃
+		//   ┃  /share to create a shareable link                 12.6K/6% ($0.05)  ┃
+		if len(newLines) >= 2 {
+			headerOffset = 2
+		}
 	}
 
 	// Find the first line index (positional) where old and new screens diverge.
