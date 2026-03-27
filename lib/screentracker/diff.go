@@ -56,7 +56,7 @@ func screenDiff(oldScreen, newScreen string, agentType msgfmt.AgentType) string 
 	if agentType == msgfmt.AgentTypeClaude {
 		for i, line := range newSectionLines {
 			trimmed := strings.TrimSpace(line)
-			if len(trimmed) >= 40 && strings.Count(trimmed, "─") == len(trimmed) {
+			if len(trimmed) >= 40 && strings.Count(trimmed, "─")*len("─") == len(trimmed) {
 				newSectionLines = newSectionLines[:i]
 				break
 			}

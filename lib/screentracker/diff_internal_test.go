@@ -3,6 +3,7 @@ package screentracker
 import (
 	"embed"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/coder/agentapi/lib/msgfmt"
@@ -13,6 +14,14 @@ import (
 var testdataDir embed.FS
 
 func TestScreenDiff(t *testing.T) {
+	t.Run("claude divider truncation", func(t *testing.T) {
+		divider := strings.Repeat("─", 80)
+		old := "line1\nline2"
+		// New content followed by full-width ─ divider and buffer artifacts below
+		newScreen := "line1\nline2\nnew content here\n" + divider + "\nstale buffer artifact\n❯ "
+		assert.Equal(t, "new content here", screenDiff(old, newScreen, msgfmt.AgentTypeClaude))
+	})
+
 	t.Run("simple", func(t *testing.T) {
 		assert.Equal(t, "", screenDiff("123456", "123456", msgfmt.AgentTypeCustom))
 		assert.Equal(t, "1234567", screenDiff("123456", "1234567", msgfmt.AgentTypeCustom))
