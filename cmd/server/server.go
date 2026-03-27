@@ -413,7 +413,7 @@ func CreateServerCmd() *cobra.Command {
 		{FlagPort, "p", 3284, "Port to run the server on", "int"},
 		{FlagPrintOpenAPI, "P", false, "Print the OpenAPI schema to stdout and exit", "bool"},
 		{FlagChatBasePath, "c", "/chat", "Base path for assets and routes used in the static files of the chat interface", "string"},
-		{FlagTermWidth, "W", uint16(80), "Width of the emulated terminal", "uint16"},
+		{FlagTermWidth, "W", uint16(220), "Width of the emulated terminal", "uint16"},
 		{FlagTermHeight, "H", uint16(1000), "Height of the emulated terminal", "uint16"},
 		// localhost is the default host for the server. Port is ignored during matching.
 		{FlagAllowedHosts, "a", []string{"localhost", "127.0.0.1", "[::1]"}, "HTTP allowed hosts (hostnames only, no ports). Use '*' for all, comma-separated list via flag, space-separated list via AGENTAPI_ALLOWED_HOSTS env var", "stringSlice"},

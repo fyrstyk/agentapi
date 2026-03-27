@@ -230,7 +230,7 @@ func TestServerCmd_AllArgs_Defaults(t *testing.T) {
 		{"port default", FlagPort, 3284, func() any { return viper.GetInt(FlagPort) }},
 		{"print-openapi default", FlagPrintOpenAPI, false, func() any { return viper.GetBool(FlagPrintOpenAPI) }},
 		{"chat-base-path default", FlagChatBasePath, "/chat", func() any { return viper.GetString(FlagChatBasePath) }},
-		{"term-width default", FlagTermWidth, uint16(80), func() any { return viper.GetUint16(FlagTermWidth) }},
+		{"term-width default", FlagTermWidth, uint16(220), func() any { return viper.GetUint16(FlagTermWidth) }},
 		{"term-height default", FlagTermHeight, uint16(1000), func() any { return viper.GetUint16(FlagTermHeight) }},
 		{"allowed-hosts default", FlagAllowedHosts, []string{"localhost", "127.0.0.1", "[::1]"}, func() any { return viper.GetStringSlice(FlagAllowedHosts) }},
 		{"allowed-origins default", FlagAllowedOrigins, []string{"http://localhost:3284", "http://localhost:3000", "http://localhost:3001"}, func() any { return viper.GetStringSlice(FlagAllowedOrigins) }},

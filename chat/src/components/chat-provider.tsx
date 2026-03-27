@@ -155,9 +155,6 @@ export function ChatProvider({ children }: PropsWithChildren) {
         eventSourceRef.current.close();
       }
 
-      // Reset messages when establishing a new connection
-      setMessages([]);
-
       if (!agentAPIUrl) {
         console.warn(
           "agentAPIUrl is not set, SSE connection cannot be established."
